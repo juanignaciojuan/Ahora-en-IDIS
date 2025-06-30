@@ -10,6 +10,7 @@ app = Flask(__name__, static_folder='static')
 CORS(app)
 
 credentials_path = os.getenv("GA_CREDENTIALS_PATH")
+print(f"Using credentials: {credentials_path}")
 if not credentials_path:
     raise RuntimeError("GA_CREDENTIALS_PATH environment variable not set")
 
@@ -23,18 +24,30 @@ def get_realtime_users():
     try:
         request = RunRealtimeReportRequest(
             property=f"properties/{GA4_PROPERTY_ID}",
-            dimensions=[Dimension(name="city")],
+            dimensions=[
+                Dimension(name="unifiedScreenName"),
+                Dimension(name="city"),
+                Dimension(name="country")
+            ],
             metrics=[Metric(name="activeUsers")]
         )
         response = client.run_realtime_report(request)
 
-        active_user_cities = [
-            row.dimension_values[0].value
-            for row in response.rows
-            if row.dimension_values[0].value.lower() not in ["(not set)", "unknown"]
-        ]
+        active_users = []
+        for row in response.rows:
+            screen_name = row.dimension_values[0].value.strip()
+            city = row.dimension_values[1].value.strip()
+            country = row.dimension_values[2].value.strip()
 
-        return jsonify({"active_user_names": active_user_cities})
+            # Validar que todos los valores existan
+            if all(val.lower() not in ["(not set)", "unknown", ""] for val in [screen_name, city, country]):
+                active_users.append({
+                    "unifiedScreenName": screen_name,
+                    "city": city,
+                    "country": country
+                })
+
+        return jsonify({"active_users": active_users})
 
     except Exception as e:
         print("Error in get_realtime_users:", str(e))
@@ -57,4 +70,4 @@ def serve_assets(filename):
     return send_from_directory('static/assets', filename)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=True)

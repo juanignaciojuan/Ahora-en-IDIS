@@ -1,20 +1,22 @@
-# Use the official Python image
-FROM python:3.10
+# Use Python base
+FROM python:3.10-slim
 
 # Set environment variables
-ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Set working directory
+# Working directory
 WORKDIR /app
 
 # Install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy app files
+# Copy app code
 COPY . .
 
-# Expose the port and run Flask
-ENV PORT=8080
+# set environment variable in container
+ENV GA_CREDENTIALS_PATH=/app/credentials.json
+
+EXPOSE 8080
+
 CMD ["python", "app.py"]

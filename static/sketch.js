@@ -1,4 +1,4 @@
-// === USER DATA ===
+// === DEMO ===
 const allUserData = [
   { name: "Astra", xPercent: 0.2, yPercent: 0.3, color: '#FF6B6B', noteIndices: [1, 2, 4] },
   { name: "Cleo", xPercent: 0.4, yPercent: 0.5, color: '#FFD93D', noteIndices: [2, 3, 5] },
@@ -17,9 +17,9 @@ const scales = {
   /*A_minor: [220, 261.63, 293.66, 329.63, 392, 440, 523.25, 587.33, 659.25, 783.99],
   C_minor: [261.63, 311.13, 349.23, 392, 466.16, 523.25, 622.25, 698.46, 783.99, 932.33],
   D_minor: [293.66, 349.23, 392, 440, 523.25, 587.33, 698.46, 783.99, 880, 1046.5],*/
-  minimal: [196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 349.23, 392.00],
-  minimal_alt1: [220.00, 246.94, 293.66, 329.63, 392.00, 440.00, 493.88, 523.25],
-  minimal_alt2: [174.61, 207.65, 233.08, 261.63, 293.66, 349.23, 392.00, 440.00]
+  minimal: [196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 349.23, 392.00, 220.00 * 2, 246.94 * 2, 261.63 * 2, 293.66 * 2, 329.63 * 2, 349.23 * 2, 392.00 * 2],
+  minimal_alt1: [220.00, 246.94, 293.66, 329.63, 392.00, 440.00, 493.88, 523.25, 293.66 * 2, 329.63 * 2, 392.00 * 2, 440.00 * 2, 493.88 * 2, 523.25 * 2],
+  minimal_alt2: [174.61, 207.65, 233.08, 261.63, 293.66, 349.23, 392.00, 440.00, 207.65 * 2, 233.08 * 2, 261.63 * 2, 293.66 * 2, 349.23 * 2, 392.00 * 2, 440.00 * 2]
 };
 
 const colorNotePalette = [
@@ -31,13 +31,13 @@ const colorNotePalette = [
   { color: '#FF8C42', index: 5 },
   { color: '#00C2A8', index: 6 },
   { color: '#FF5DA2', index: 7 },
-  { color: '#A3A1FB', index: 0 },
-  { color: '#FBB13C', index: 1 },
-  { color: '#A89F91', index: 2 },
-  { color: '#8C9C8C', index: 3 },
-  { color: '#B0A18F', index: 4 },
-  { color: '#FFB7C5', index: 5 },
-  { color: '#AEC6CF', index: 6 }
+  { color: '#A3A1FB', index: 8 },
+  { color: '#FBB13C', index: 9 },
+  { color: '#A89F91', index: 10 },
+  { color: '#8C9C8C', index: 11 },
+  { color: '#B0A18F', index: 12 },
+  { color: '#FFB7C5', index: 13 },
+  { color: '#AEC6CF', index: 14 }
 ];
 
 const isDemoMode = new URLSearchParams(window.location.search).get("demo") === "true";
@@ -90,22 +90,28 @@ function draw() {
     const isMouseOver = dist(mouseX, mouseY, pos.x, pos.y) < 30;
     const noteIndex = userNoteIndices[name];
     const pulseSpeed = notes[noteIndex] || 1;
-    const size = 20 + sin(frameCount * pulseSpeed * 0.01) * 5;
+    const size = 20 + sin(frameCount * pulseSpeed * 0.0001) * 5;
 
     fill(user.color + (isMouseOver ? "FF" : "AA"));
     ellipse(pos.x, pos.y, size);
 
-    fill(255);
-    textAlign(CENTER, TOP);
-    textSize(20);
-    text(user.name, pos.x, pos.y + 40);
-
     if (isMouseOver) {
       const freq = notes[noteIndex];
-      if (!hoverOscillators[i] && isFinite(freq)) {
+      if (!hoverOscillators[i] || !isFinite(hoverOscillators[i].sineOsc.freq().value)) {
+        stopHoverOscillator(i);  // Detenemos cualquier oscilador anterior duplicado
         hoverOscillators[i] = createHoverOscillator(freq);
       }
 
+      // Mostrar detalles al hacer hover
+      let info = "";
+      if (user.unifiedScreenName) info += `${user.unifiedScreenName}\n`;
+      if (user.city) info += `${user.city}\n`;
+      if (user.country) info += `${user.country}\n`;
+
+      fill(255);
+      textAlign(CENTER, TOP);
+      textSize(16);
+      text(info.trim(), pos.x, pos.y + 40);
     } else if (hoverOscillators[i]) {
       stopHoverOscillator(i);
     }
@@ -114,7 +120,10 @@ function draw() {
   fill(255);
   textAlign(CENTER, TOP);
   textSize(20);
-  text(`Usuarios activos: ${activeUsers}`, width / 2, 20);
+  text(`Conexiones a IDIS: ${activeUsers}`, width / 2, 20);
+  /*text(`Conexiones: ${connections.length}`, width / 2, 50);  // NUEVA LÍNEA*/
+
+  console.log(dynamicUserData);
 }
 
 // === USER INTERACTION ===
@@ -158,8 +167,10 @@ function createMainMenu() {
   startBtn = createButton("Escuchando a IDIS");
   startBtn.position(windowWidth / 2 - 110, windowHeight / 2 - 30);
   startBtn.size(250, 50);
+  startBtn.style('color', 'red');
   startBtn.style('font-size', '25px');
   startBtn.style('font-family', 'Helvetica');
+  startBtn.style('font-weight', 'bold');
   startBtn.style('border-radius', '10px');
   startBtn.style('cursor', 'pointer');
   startBtn.mousePressed(startApp);
@@ -169,20 +180,17 @@ function startApp() {
   removeElements();
   userStartAudio(); getAudioContext().resume();
   soundStarted = true; circlesVisible = true;
-
-  if (isDemoMode) {
-    fetchInterval = setInterval(updateDemoUsers, 15000);
-    updateDemoUsers();
-  } else {
-    fetchInterval = setInterval(updateRealNotes, 15000);
-    updateRealUsers(); // fetches once at start
-  }
-
   createFullscreenButton(); createRestartButton();
-  setInterval(() => {
-    if (isDemoMode) updateDemoUsers();
-    else updateRealNotes();
-  }, 15000);
+  if (isDemoMode) {
+    updateDemoUsers();
+    fetchInterval = setInterval(updateDemoUsers, 15000);
+  } else {
+    updateRealUsers();
+    fetchInterval = setInterval(() => {
+      updateRealUsers();      // actualiza usuarios si hay nuevos
+      updateRealNotes();      // cambia frecuencias con nueva escala suave
+    }, 15000);
+  }
 }
 
 function createFullscreenButton() {
@@ -282,27 +290,38 @@ async function updateRealUsers() {
     const response = await fetch('/active_users');
     const data = await response.json();
 
-    if (data.active_user_names && data.active_user_names.length > 0) {
-      const fetchedNames = data.active_user_names.filter(name => name !== "Unknown");
-      activeUserNames = fetchedNames;
-      activeUsers = fetchedNames.length;
-      notes = chooseNewScaleKey();
+    if (Array.isArray(data.active_users) && data.active_users.length > 0) {
+      const fetchedUsers = data.active_users
+        .filter(u => u.unifiedScreenName && u.city && u.country)
+        .slice(0, colorNotePalette.length);
+
+      activeUserNames = fetchedUsers.map(u => u.unifiedScreenName);
+      activeUsers = fetchedUsers.length;
       userNoteIndices = {};
 
-      fetchedNames.forEach(name => {
+      let availablePairs = shuffle([...colorNotePalette]); // randomiza para mayor variedad
+
+      fetchedUsers.forEach(u => {
+        const name = u.unifiedScreenName;
+
+        // Si el usuario ya tiene datos asignados, conservar color y nota
         if (!dynamicUserData[name]) {
-          const assignedColor = colorFromString(name);
-          const noteIndex = noteIndexFromColor(assignedColor);
+          const pair = availablePairs.shift();
+          if (!pair) return;
+
           dynamicUserData[name] = {
             name,
+            unifiedScreenName: u.unifiedScreenName,
+            city: u.city,
+            country: u.country,
             xPercent: random(0.2, 0.8),
             yPercent: random(0.2, 0.8),
-            color: assignedColor,
-            noteIndex
+            color: pair.color,
+            noteIndex: pair.index  // store original index
           };
         }
 
-        // Use the already assigned noteIndex
+        // always assign note index from stored
         userNoteIndices[name] = dynamicUserData[name].noteIndex;
       });
 
@@ -318,19 +337,9 @@ async function updateRealUsers() {
 
 function updateRealNotes() {
   const previousScaleKey = currentScaleKey;
-  notes = chooseNewScaleKey(currentScaleKey);  // Avoid repeat
-
-  activeUserNames.forEach(name => {
-    const user = dynamicUserData[name];
-    if (user) {
-      const index = user.noteIndex; // Fixed noteIndex per user
-      user.color = colorNotePalette.find(entry => entry.index === index)?.color || '#FFFFFF';
-      userNoteIndices[name] = index;
-    }
-  });
-
-  updateOscillators();
+  notes = chooseNewScaleKey(previousScaleKey);
 }
+
 
 // === UTILITIES ===
 function chooseNewScaleKey(previousKey = currentScaleKey) {
@@ -398,20 +407,20 @@ function getUserConnections(pixelPositions) {
   return { connections };
 }
 
-function colorFromString(str) {
+/*function colorFromString(str) {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
   }
   return colorNotePalette[Math.abs(hash) % colorNotePalette.length].color;
-}
+}*/
 
 // === AUDIO ===
 function updateOscillators() {
   oscillators.forEach(o => {
     if (o) {
-      o.sine.amp(0, 0.3);
-      o.noise.amp(0, 0.3);
+      o.sine.amp(0, 2);
+      o.noise.amp(0, 2);
       setTimeout(() => {
         o.sine.stop(); o.noise.stop();
         o.sine.dispose(); o.noise.dispose();
@@ -434,12 +443,12 @@ function updateOscillators() {
     const sine = new p5.Oscillator('sine');
     sine.freq(freq); sine.amp(0);
     sine.disconnect(); sine.connect(filter); sine.start();
-    sine.amp(0.015, 0.6);
+    sine.amp(0.015, 2);
 
     const noise = new p5.Noise('white');
     noise.amp(0); noise.disconnect();
     noise.connect(filter); noise.start();
-    noise.amp(0.007, 0.6);
+    noise.amp(0.007, 2);
 
     oscillators.push({ sine, noise, filter });
   }
@@ -473,9 +482,11 @@ function createHoverOscillator(freq) {
 function stopHoverOscillator(i) {
   const o = hoverOscillators[i];
   if (!o) return;
-  o.sineOsc.amp(0, 0.3);
-  o.noise.amp(0, 0.3);
-  setTimeout(() => stopHoverOscillatorImmediate(o), 500);
+
+  // Solo detiene si no está ya en proceso
+  o.sineOsc.amp(0, 0.5);
+  o.noise.amp(0, 0.5);
+  setTimeout(() => stopHoverOscillatorImmediate(o), 1500);
   hoverOscillators[i] = null;
 }
 
@@ -487,7 +498,7 @@ function stopHoverOscillatorImmediate(o) {
   if (o.filter) o.filter.dispose();
 }
 
-function noteIndexFromColor(color) {
+/*function noteIndexFromColor(color) {
   const match = colorNotePalette.find(entry => entry.color === color);
   return match ? match.index : floor(random(notes.length));
-}
+}*/
