@@ -1,0 +1,23 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build',
+      '-t', 'gcr.io/listen-to-idis/escuchando-a-idis:$SHORT_SHA',
+      '.'
+    ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'push',
+      'gcr.io/listen-to-idis/escuchando-a-idis:$SHORT_SHA'
+    ]
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args: [
+      'run', 'deploy', 'escuchando-a-idis',
+      '--image', 'gcr.io/listen-to-idis/escuchando-a-idis:$SHORT_SHA',
+      '--region', 'us-central1',
+      '--platform', 'managed',
+      '--allow-unauthenticated'
+    ]
+images:
+  - 'gcr.io/listen-to-idis/escuchando-a-idis:$SHORT_SHA'
