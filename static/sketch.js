@@ -167,7 +167,7 @@ function createMainMenu() {
   startBtn = createButton("Escuchando a IDIS");
   startBtn.position(windowWidth / 2 - 110, windowHeight / 2 - 30);
   startBtn.size(250, 50);
-  startBtn.style('color', 'red');
+  startBtn.style('color', 'black');
   startBtn.style('font-size', '25px');
   startBtn.style('font-family', 'Helvetica');
   startBtn.style('font-weight', 'bold');
