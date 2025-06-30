@@ -21,3 +21,5 @@ steps:
     ]
 images:
   - 'gcr.io/listen-to-idis/escuchando-a-idis:$SHORT_SHA'
+options:
+  logging: CLOUD_LOGGING_ONLY
