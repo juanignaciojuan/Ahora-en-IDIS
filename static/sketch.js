@@ -120,7 +120,7 @@ function draw() {
   fill(255);
   textAlign(CENTER, TOP);
   textSize(20);
-  text(`Conexiones a IDIS: ${activeUsers}`, width / 2, 20);
+  text(`Ahora en IDIS: ${activeUsers}`, width / 2, 20);
   /*text(`Conexiones: ${connections.length}`, width / 2, 50);  // NUEVA LÍNEA*/
 
   console.log(dynamicUserData);
@@ -164,7 +164,7 @@ function windowResized() {
 function createMainMenu() {
   removeElements();
   background('#202020');
-  startBtn = createButton("Escuchando a IDIS");
+  startBtn = createButton("Ahora en IDIS");
   startBtn.position(windowWidth / 2 - 110, windowHeight / 2 - 30);
   startBtn.size(250, 50);
   startBtn.style('color', 'black');
