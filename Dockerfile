@@ -13,7 +13,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy app code
 COPY . .
-COPY credentials.json /app/credentials.json
 
 # set environment variable in container
 ENV GA_CREDENTIALS_PATH=/app/credentials.json
