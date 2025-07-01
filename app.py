@@ -3,18 +3,19 @@ from flask_cors import CORS
 from google.analytics.data_v1beta import BetaAnalyticsDataClient
 from google.analytics.data_v1beta.types import RunRealtimeReportRequest, Dimension, Metric
 from google.oauth2 import service_account
-
 import os
+import json
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
 
-credentials_path = os.getenv("GA_CREDENTIALS_PATH")
-print(f"Using credentials: {credentials_path}")
-if not credentials_path:
-    raise RuntimeError("GA_CREDENTIALS_PATH environment variable not set")
+# Ahora tomamos el JSON directamente del secreto expuesto en variable
+credentials_json = os.getenv("GA_CREDENTIALS_JSON")
+if not credentials_json:
+    raise RuntimeError("GA_CREDENTIALS_JSON environment variable not set")
 
-credentials = service_account.Credentials.from_service_account_file(credentials_path)
+credentials_info = json.loads(credentials_json)
+credentials = service_account.Credentials.from_service_account_info(credentials_info)
 client = BetaAnalyticsDataClient(credentials=credentials)
 
 GA4_PROPERTY_ID = "393664216"
