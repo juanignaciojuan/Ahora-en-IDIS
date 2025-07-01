@@ -120,8 +120,8 @@ function draw() {
   fill(255);
   textAlign(CENTER, TOP);
   textSize(20);
-  text(`Ahora en IDIS: ${activeUsers}`, width / 2, 20);
-  /*text(`Conexiones: ${connections.length}`, width / 2, 50);  // NUEVA LÍNEA*/
+  /*text(`Ahora en IDIS: ${activeUsers}`, width / 2, 20);*/
+  /*text(`Conexiones: ${connections.length}`, width / 2, 50);*/
 
   console.log(dynamicUserData);
 }
