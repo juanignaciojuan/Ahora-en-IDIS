@@ -167,7 +167,7 @@ function createMainMenu() {
   startBtn = createButton("Ahora en IDIS");
   startBtn.position(windowWidth / 2 - 110, windowHeight / 2 - 30);
   startBtn.size(250, 50);
-  startBtn.style('color', 'green');
+  startBtn.style('color', 'blue');
   startBtn.style('font-size', '25px');
   startBtn.style('font-family', 'Helvetica');
   startBtn.style('font-weight', 'bold');
