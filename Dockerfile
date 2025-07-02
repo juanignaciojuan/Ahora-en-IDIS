@@ -14,9 +14,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy app code
 COPY . .
 
-# set environment variable in container
-ENV GA_CREDENTIALS_PATH=/app/credentials.json
-
 EXPOSE 8080
 
 CMD ["python", "app.py"]

@@ -9,7 +9,7 @@ import json
 app = Flask(__name__, static_folder='static')
 CORS(app)
 
-credentials_path = os.getenv("GA_CREDENTIALS_PATH")
+credentials_path = os.getenv("GA_CREDENTIALS_PATH", "/secrets/GA_CREDENTIALS_PATH")
 if not credentials_path or not os.path.exists(credentials_path):
     raise RuntimeError("GA_CREDENTIALS_PATH environment variable not set or file not found")
 
