@@ -9,13 +9,11 @@ import json
 app = Flask(__name__, static_folder='static')
 CORS(app)
 
-credentials_path = os.getenv("GA_CREDENTIALS_PATH", "/secrets/GA_CREDENTIALS_PATH")
-if not credentials_path or not os.path.exists(credentials_path):
-    raise RuntimeError("GA_CREDENTIALS_PATH environment variable not set or file not found")
+credentials_json = os.getenv("GA_CREDENTIALS_JSON")
+if not credentials_json:
+    raise RuntimeError("GA_CREDENTIALS_JSON not set")
 
-with open(credentials_path) as f:
-    credentials_info = json.load(f)
-
+credentials_info = json.loads(credentials_json)
 credentials = service_account.Credentials.from_service_account_info(credentials_info)
 client = BetaAnalyticsDataClient(credentials=credentials)
 

@@ -37,7 +37,18 @@ const colorNotePalette = [
   { color: '#8C9C8C', index: 11 },
   { color: '#B0A18F', index: 12 },
   { color: '#FFB7C5', index: 13 },
-  { color: '#AEC6CF', index: 14 }
+  { color: '#AEC6CF', index: 14 },
+  { color: '#E07A5F', index: 15 },
+  { color: '#3D405B', index: 16 },
+  { color: '#81B29A', index: 17 },
+  { color: '#F2CC8F', index: 18 },
+  { color: '#9A8C98', index: 19 },
+  { color: '#B5838D', index: 20 },
+  { color: '#6D6875', index: 21 },
+  { color: '#FFC857', index: 22 },
+  { color: '#119DA4', index: 23 },
+  { color: '#19647E', index: 24 }
+
 ];
 
 const isDemoMode = new URLSearchParams(window.location.search).get("demo") === "true";
@@ -167,7 +178,7 @@ function createMainMenu() {
   startBtn = createButton("Ahora en IDIS");
   startBtn.position(windowWidth / 2 - 110, windowHeight / 2 - 30);
   startBtn.size(250, 50);
-  startBtn.style('color', 'blue');
+  startBtn.style('color', 'black');
   startBtn.style('font-size', '25px');
   startBtn.style('font-family', 'Helvetica');
   startBtn.style('font-weight', 'bold');
