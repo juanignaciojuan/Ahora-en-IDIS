@@ -1,0 +1,133 @@
+Google Cloud Run app:
+https://ahora-en-idis-at3xto3baa-uc.a.run.app/
+https://ahora-en-idis-107502676308.us-central1.run.app/
+https://proyectoidis.org/ahora-en-idis/
+
+A requirements.txt lists the Python libraries your app needs. To use it on a new computer:
+
+Install Python (preferably version 3.10+).
+
+Open terminal or PowerShell in your project folder.
+
+(Recommended) Create a virtual environment:
+
+bash
+Copy
+Edit
+python -m venv venv
+.\venv\Scripts\activate  # On Windows
+Install the dependencies:
+
+bash
+Copy
+Edit
+pip install -r requirements.txt
+Make sure to set the environment variable with the correct path to credentials.json.
+
+nuevo git:
+git init
+echo credentials.json > .gitignore
+git add .
+git commit -m "Primer commit limpio"
+git remote add origin https://github.com/TU_USUARIO/NOMBRE_DEL_REPO.git
+git branch -M main
+git push -u origin main
+
+
+borrar la carpeta oculta .git que guarda la configuración del repositorio actual:
+rmdir /s /q .git
+
+
+si credentials.json está en una carpeta obsoleta, entonces relocalizar desde PowerShell usando (ej.):
+
+$env:GA_CREDENTIALS_PATH="C:\Users\juan_\Desktop\FADU\2025\IDIS\ahora-en-idis\credentials.json"
+
+
+fijar desde PowerShell la ubicación de credentials.json:
+setx GA_CREDENTIALS_PATH "C:\Users\juan_\Desktop\FADU\2025\IDIS\escuchando-a-idis\credentials.json"
+
+$env:GA_CREDENTIALS_JSON = Get-Content -Raw C:\Users\juan_\Desktop\FADU\2025\IDIS\ahora-en-idis\credentials.json
+
+Qué hace este comando
+bash
+Copy
+Edit
+export GA_CREDENTIALS_JSON="$(cat /ruta/local/credentials.json)"
+python app.py
+cat /ruta/local/credentials.json lee el contenido del archivo JSON con las credenciales de Google Analytics.
+
+El resultado se guarda como texto completo dentro de la variable de entorno GA_CREDENTIALS_JSON.
+
+export la hace disponible para el proceso que ejecutes a continuación.
+
+Luego python app.py arranca tu servidor Flask, que usa esa variable para autenticarse.
+
+Es una forma de simular localmente en tu PC lo que Cloud Run hace automáticamente con el secreto.
+
+Google Cloud (5-7, empecé a usar Cloud Shell)
+ Set your active project:
+gcloud config set project listen-to-idis
+
+
+https://ahora-en-idis-at3xto3baa-uc.a.run.app/active_users
+
+
+Para probarlo, abre el navegador y visita la URL de tu servicio Cloud Run.
+Puedes ver la URL exacta con este comando:
+
+bash
+Copy code
+gcloud run services describe ahora-en-idis \
+  --region=us-central1 \
+  --format="value(status.url)"
+
+
+• ¿Cómo reflejar tus cambios en Cloud Run? [Usando Cloud Shell]
+El flujo completo es:
+
+  ◘ Modificas tu código (por ejemplo agregas el nuevo endpoint)
+
+  ◘ Opcional: haces commit y push a GitHub (esto es solo para respaldo o colaboración)
+
+  ◘ Build de la imagen con Docker (si no cambió el requirements.txt podés reusar el build):
+docker build -t gcr.io/listen-to-idis/ahora-en-idis .
+
+  ◘ Subir la imagen al Container Registry:
+docker push gcr.io/listen-to-idis/ahora-en-idis
+
+  ◘ Desplegar nuevamente en Cloud Run:
+gcloud run deploy ahora-en-idis \
+  --image=gcr.io/listen-to-idis/ahora-en-idis \
+  --region=us-central1 \
+  --allow-unauthenticated \
+  --service-account=ahora-en-idis-run-sa@listen-to-idis.iam.gserviceaccount.com \
+  --set-secrets=GA_CREDENTIALS_JSON=credentials:latest
+
+    →recién ahí tu https://ahora-en-idis-at3xto3baa-uc.a.run.app/ mostrará los cambios.
+
+  ◘ ¿Qué pasó en Cloud Shell?
+Cuando intentaste:
+
+docker build -t gcr.io/listen-to-idis/ahora-en-idis .
+te dio el error:
+
+ERROR: failed to solve: failed to read dockerfile: open Dockerfile: no such file or directory
+Esto pasa porque en Cloud Shell tuviste abierto el directorio ~, que no tiene el código de tu proyecto.
+Recordá que habías subido tu proyecto a ~/ahora-en-idis, entonces primero hacé:
+
+cd ~/ahora-en-idis
+y ahí recién corrés:
+
+docker build -t gcr.io/listen-to-idis/ahora-en-idis .
+
+• Ver archivos en cloud shell: ls -l
+
+• Ver el ultimo log:
+juanignaciogonzalez_253a@cloudshell:~/ahora-en-idis (listen-to-idis)$ gcloud run services logs read ahora-en-idis \
+  --region=us-central1 \
+  --limit=50
+
+Local
+http://localhost:8080/active_users_count
+
+http://localhost:8080/active_users
