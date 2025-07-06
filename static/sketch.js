@@ -47,8 +47,37 @@ const colorNotePalette = [
   { color: '#6D6875', index: 21 },
   { color: '#FFC857', index: 22 },
   { color: '#119DA4', index: 23 },
-  { color: '#19647E', index: 24 }
-
+  { color: '#19647E', index: 24 },
+{ color: '#D7263D', index: 25 },
+  { color: '#F46036', index: 26 },
+  { color: '#2E294E', index: 27 },
+  { color: '#1B998B', index: 28 },
+  { color: '#E71D36', index: 29 },
+  { color: '#FF9F1C', index: 30 },
+  { color: '#2EC4B6', index: 31 },
+  { color: '#E71D36', index: 32 },
+  { color: '#FFBF69', index: 33 },
+  { color: '#CB997E', index: 34 },
+  { color: '#6B4226', index: 35 },
+  { color: '#8D99AE', index: 36 },
+  { color: '#EF233C', index: 37 },
+  { color: '#D90429', index: 38 },
+  { color: '#F94144', index: 39 },
+  { color: '#F3722C', index: 40 },
+  { color: '#F9844A', index: 41 },
+  { color: '#F9C74F', index: 42 },
+  { color: '#90BE6D', index: 43 },
+  { color: '#43AA8B', index: 44 },
+  { color: '#577590', index: 45 },
+  { color: '#277DA1', index: 46 },
+  { color: '#4D908E', index: 47 },
+  { color: '#A2D5C6', index: 48 },
+  { color: '#FF6F59', index: 49 },
+  { color: '#254441', index: 50 },
+  { color: '#43BCCD', index: 51 },
+  { color: '#F7FFF7', index: 52 },
+  { color: '#FCE38A', index: 53 },
+  { color: '#EAFFD0', index: 54 },
 ];
 
 const isDemoMode = new URLSearchParams(window.location.search).get("demo") === "true";
@@ -308,6 +337,7 @@ async function updateRealUsers() {
 
       activeUserNames = fetchedUsers.map(u => u.unifiedScreenName);
       activeUsers = fetchedUsers.length;
+      console.log(`Usuarios conectados en vivo: ${activeUsers}`);  // <-- Aquí
       userNoteIndices = {};
 
       let availablePairs = shuffle([...colorNotePalette]); // randomiza para mayor variedad
@@ -340,6 +370,7 @@ async function updateRealUsers() {
     } else {
       activeUserNames = [];
       activeUsers = 0;
+      console.log(`Usuarios conectados en vivo: ${activeUsers}`);  // <-- Y aquí
     }
   } catch (error) {
     console.error("Error fetching real user data:", error);
