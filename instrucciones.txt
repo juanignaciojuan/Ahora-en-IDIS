@@ -64,19 +64,18 @@ Luego python app.py arranca tu servidor Flask, que usa esa variable para autenti
 
 Es una forma de simular localmente en tu PC lo que Cloud Run hace automáticamente con el secreto.
 
-Google Cloud (5-7, empecé a usar Cloud Shell)
- Set your active project:
+5-7: empecé a usar Google Cloud Shell.
+
+Set your active project:
 gcloud config set project listen-to-idis
 
-
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 https://ahora-en-idis-at3xto3baa-uc.a.run.app/active_users
-
+.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
 
 Para probarlo, abre el navegador y visita la URL de tu servicio Cloud Run.
 Puedes ver la URL exacta con este comando:
 
-bash
-Copy code
 gcloud run services describe ahora-en-idis \
   --region=us-central1 \
   --format="value(status.url)"
@@ -84,6 +83,9 @@ gcloud run services describe ahora-en-idis \
 
 • ¿Cómo reflejar tus cambios en Cloud Run? [Usando Cloud Shell]
 El flujo completo es:
+
+Set your active project:
+gcloud config set project listen-to-idis
 
   ◘ Modificas tu código (por ejemplo agregas el nuevo endpoint)
 
@@ -116,9 +118,14 @@ Esto pasa porque en Cloud Shell tuviste abierto el directorio ~, que no tiene el
 Recordá que habías subido tu proyecto a ~/ahora-en-idis, entonces primero hacé:
 
 cd ~/ahora-en-idis
-y ahí recién corrés:
 
+capaz necesitás:
 docker build -t gcr.io/listen-to-idis/ahora-en-idis .
+
+corrés:
+docker build -t gcr.io/listen-to-idis/ahora-en-idis .
+
+etc...
 
 • Ver archivos en cloud shell: ls -l
 

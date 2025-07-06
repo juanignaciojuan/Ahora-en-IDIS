@@ -362,28 +362,67 @@ async function updateRealUsers() {
       let availablePairs = shuffle([...colorNotePalette]); // randomiza para mayor variedad
 
       fetchedUsers.forEach(u => {
-        const name = u.unifiedScreenName;
+  const name = u.unifiedScreenName;
 
-        // Si el usuario ya tiene datos asignados, conservar color y nota
-        if (!dynamicUserData[name]) {
-          const pair = availablePairs.shift();
-          if (!pair) return;
+  if (!dynamicUserData[name]) {
+    const pair = availablePairs.shift();
+    if (!pair) return;
 
-          dynamicUserData[name] = {
-            name,
-            unifiedScreenName: u.unifiedScreenName,
-            city: u.city,
-            country: u.country,
-            xPercent: random(0.2, 0.8),
-            yPercent: random(0.2, 0.8),
-            color: pair.color,
-            noteIndex: pair.index  // store original index
-          };
-        }
+    // asignar posición inicial random con separación mínima
+    let attempts = 0;
+    let minDistance = 0.1; // 10% del ancho/alto mínimo
+    let x, y;
 
-        // always assign note index from stored
-        userNoteIndices[name] = dynamicUserData[name].noteIndex;
-      });
+    do {
+      x = random(0.2, 0.8);
+      y = random(0.2, 0.8);
+      attempts++;
+    } while (
+      Object.values(dynamicUserData).some(existing => {
+        return dist(existing.xPercent ?? 0, existing.yPercent ?? 0, x, y) < minDistance;
+      }) && attempts < 10
+    );
+
+    dynamicUserData[name] = {
+      name,
+      unifiedScreenName: u.unifiedScreenName,
+      city: u.city,
+      country: u.country,
+      xPercent: x,
+      yPercent: y,
+      color: pair.color,
+      noteIndex: pair.index
+    };
+  }
+
+  userNoteIndices[name] = dynamicUserData[name].noteIndex;
+});
+
+      // dentro del updateRealUsers:
+      let attempts = 0;
+      let minDistance = 0.1; // 10% de ancho/alto mínimo
+      let x, y;
+
+      do {
+        x = random(0.2, 0.8);
+        y = random(0.2, 0.8);
+        attempts++;
+      } while (
+        Object.values(dynamicUserData).some(existing => {
+          return dist(existing.xPercent, existing.yPercent, x, y) < minDistance;
+        }) && attempts < 10
+      );
+
+      dynamicUserData[name] = {
+        name,
+        unifiedScreenName: u.unifiedScreenName,
+        city: u.city,
+        country: u.country,
+        xPercent: x,
+        yPercent: y,
+        color: pair.color,
+        noteIndex: pair.index
+      };
 
       updateOscillators();
     } else {
